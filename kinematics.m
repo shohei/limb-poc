@@ -15,6 +15,22 @@ node2(x1);
 link1(x0,x1);
 link2(x1,x2);
 
+if(theta1<90)
+   if(theta2<180) 
+   
+   elseif(theta2>=180)
+       
+   end
+elseif (theta1>=90)
+    if (theta2<180)
+        
+    elseif(theta2>=180)
+        
+    end
+end
+
+
+
 function node1(x)
 circle(x);
 end

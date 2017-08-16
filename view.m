@@ -89,18 +89,9 @@ L1 = handles.L1;
 L2 = handles.L2;
 theta1_theta2 = sprintf('%.2f, %.2f',theta1,theta2);
 theta1_theta2
+axes(handles.axes1);
+drawAxis(L1,L2,theta1,theta2);
 
-x0 = [0,0];
-x1 = [L1*cos(theta1*pi/180),L1*sin(theta1*pi/180)];
-x2 = [x1(1)+L2*cos(theta2*pi/180),x1(2)+L2*sin(theta2*pi/180)];
-
-cla;
-xlim([-4,4]);
-ylim([-4,4]);
-node1(x0);
-node2(x1);
-link1(x0,x1);
-link2(x1,x2);
 % Hints: get(hObject,'Value') returns position of slider
 %        get(hObject,'Min') and get(hObject,'Max') to determine range of slider
 
@@ -128,18 +119,9 @@ L1 = handles.L1;
 L2 = handles.L2;
 theta1_theta2 = sprintf('%.2f, %.2f',theta1,theta2);
 theta1_theta2
+axes(handles.axes1);
+drawAxis(L1,L2,theta1,theta2);
 
-x0 = [0,0];
-x1 = [L1*cos(theta1*pi/180),L1*sin(theta1*pi/180)];
-x2 = [x1(1)+L2*cos(theta2*pi/180),x1(2)+L2*sin(theta2*pi/180)];
-
-cla;
-xlim([-4,4]);
-ylim([-4,4]);
-node1(x0);
-node2(x1);
-link1(x0,x1);
-link2(x1,x2);
 % hObject    handle to slider2 (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
@@ -157,6 +139,20 @@ function slider2_CreateFcn(hObject, eventdata, handles)
 if isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
     set(hObject,'BackgroundColor',[.9 .9 .9]);
 end
+
+
+function drawAxis(L1,L2,theta1,theta2)
+x0 = [0,0];
+x1 = [L1*cos(theta1*pi/180),L1*sin(theta1*pi/180)];
+x2 = [x1(1)+L2*cos((theta2+theta1-180)*pi/180),x1(2)+L2*sin((theta2+theta1-180)*pi/180)];
+
+cla;
+xlim([-4,4]);
+ylim([-4,4]);
+node1(x0);
+node2(x1);
+link1(x0,x1);
+link2(x1,x2);
 
 
 function circle(x)
