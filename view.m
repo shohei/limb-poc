@@ -54,8 +54,8 @@ function view_OpeningFcn(hObject, eventdata, handles, varargin)
 
 % Choose default command line output for view
 handles.output = hObject;
-handles.theta1 = 0;
-handles.theta2 = 0;
+handles.theta1 = 90;
+handles.theta2 = 180;
 handles.L1 = 0.5;
 handles.L2 = 0.5;
 % Update handles structure
@@ -105,6 +105,7 @@ w1 = 0.3;
 w2 = 0.3;
 F = 60;
 M2 = F*L2*cos((theta1+theta2-180)*pi/180) + m2*g*cos((theta1+theta2-180)*pi/180);
+M2 = abs(M2)+100;
 plot3(theta1,theta2,M2,'ro','LineWidth',10);
 
 axes(handles.axes2);
@@ -115,8 +116,9 @@ hold on;
 M1 = F*(L2*cos((theta1+theta2-180)*pi/180)+L1*cos(theta1*pi/180)) ...
      + m2*g*(L2*cos((theta1+theta2-180)*pi/180)+L1*cos(theta1*pi/180))...
      + w2*L1*cos(theta1*pi/180) ...
-     + m1*g*(L1/2*cos(theta1*pi/180)); 
-plot3(theta1,theta2,M2,'ro','LineWidth',10);
+     + m1*g*(L1/2*cos(theta1*pi/180));
+M1 = abs(M1)+100;
+plot3(theta1,theta2,M1,'ro','LineWidth',10);
 
 % Hints: get(hObject,'Value') returns position of slider
 %        get(hObject,'Min') and get(hObject,'Max') to determine range of slider
@@ -159,6 +161,7 @@ w1 = 0.3;
 w2 = 0.3;
 F = 60;
 M2 = F*L2*cos((theta1+theta2-180)*pi/180) + m2*g*cos((theta1+theta2-180)*pi/180);
+M2 = abs(M2)+100;
 plot3(theta1,theta2,M2,'ro','LineWidth',10);
 hold on;
 initM2;
@@ -170,7 +173,8 @@ M1 = F*(L2*cos((theta1+theta2-180)*pi/180)+L1*cos(theta1*pi/180)) ...
      + m2*g*(L2*cos((theta1+theta2-180)*pi/180)+L1*cos(theta1*pi/180)) ...
      + w2*L1*cos(theta1*pi/180) ...
      + m1*g*(L1/2*cos(theta1*pi/180));
-plot3(theta1,theta2,M2,'ro','LineWidth',10);
+M1 = abs(M1)+100;
+plot3(theta1,theta2,M1,'ro','LineWidth',10);
 hold on;
 initM1;
 rotate3d on;
@@ -221,8 +225,13 @@ theta1 = linspace(0,180,31);
 theta2 = linspace(0,360,31);
 [X,Y] = meshgrid(theta1,theta2);
 M2 = F*L2*cos((X+Y-180)*pi/180) + m2*g*L2*cos((X+Y-180)*pi/180);
+M2 = abs(M2);
 surf(X,Y,M2);
+xlim([0,180]);
+ylim([0,360]);
 hold on;
+% view(0,90);
+
 
 function initM1
 m1 = 0.2;
@@ -241,8 +250,12 @@ M1 = F*(L2*cos((X+Y-180)*pi/180)+L1*cos(X*pi/180)) ...
      + m2*g*(L2*cos((X+Y-180)*pi/180)+L1*cos(X*pi/180))...
      + w2*L1*cos(X*pi/180) ...
      + m1*g*(L1/2*cos(X*pi/180));
+M1 = abs(M1);
 surf(X,Y,M1);
 hold on;
+xlim([0,180]);
+ylim([0,360]);
+% view(0,90);
 
 
 function circle(x)
