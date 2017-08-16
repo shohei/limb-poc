@@ -56,11 +56,10 @@ function view_OpeningFcn(hObject, eventdata, handles, varargin)
 handles.output = hObject;
 handles.theta1 = 0;
 handles.theta2 = 0;
-handles.L1 = 2;
-handles.L2 = 2;
+handles.L1 = 0.5;
+handles.L2 = 0.5;
 % Update handles structure
 guidata(hObject, handles);
-
 % UIWAIT makes view wait for user response (see UIRESUME)
 % uiwait(handles.figure1);
 
@@ -74,7 +73,7 @@ function varargout = view_OutputFcn(hObject, eventdata, handles)
 
 % Get default command line output from handles structure
 varargout{1} = handles.output;
-
+varargout{2} = 0;
 
 % --- Executes on slider movement.
 function slider1_Callback(hObject, eventdata, handles)
@@ -88,9 +87,25 @@ theta2 = handles.theta2;
 L1 = handles.L1;
 L2 = handles.L2;
 theta1_theta2 = sprintf('%.2f, %.2f',theta1,theta2);
-theta1_theta2
+% theta1_theta2
 axes(handles.axes1);
 drawAxis(L1,L2,theta1,theta2);
+axes(handles.axes3);
+cla;
+initM2;
+% set(handles.axes3,'view',[-37.5 30]);
+rotate3d;
+hold on;
+m1 = 0.2;
+m2 = 0.2;
+g = 9.8;
+L1 = 0.5;
+L2 = 0.5;
+w1 = 0.3;
+w2 = 0.3;
+F = 60;
+M2 = F*L2*cos((theta1+theta2-180)*pi/180) + m2*g*cos((theta1+theta2-180)*pi/180);
+plot3(theta1,theta2,M2,'ro','LineWidth',10);
 
 % Hints: get(hObject,'Value') returns position of slider
 %        get(hObject,'Min') and get(hObject,'Max') to determine range of slider
@@ -118,9 +133,25 @@ theta2 = handles.theta2;
 L1 = handles.L1;
 L2 = handles.L2;
 theta1_theta2 = sprintf('%.2f, %.2f',theta1,theta2);
-theta1_theta2
+% theta1_theta2
 axes(handles.axes1);
 drawAxis(L1,L2,theta1,theta2);
+axes(handles.axes3);
+cla;
+initM2;
+% set(handles.axes3,'view',[-37.5 30]);
+rotate3d;
+hold on;
+m1 = 0.2;
+m2 = 0.2;
+g = 9.8;
+L1 = 0.5;
+L2 = 0.5;
+w1 = 0.3;
+w2 = 0.3;
+F = 60;
+M2 = F*L2*cos((theta1+theta2-180)*pi/180) + m2*g*cos((theta1+theta2-180)*pi/180);
+plot3(theta1,theta2,M2,'ro','LineWidth',10);
 
 % hObject    handle to slider2 (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
@@ -147,16 +178,33 @@ x1 = [L1*cos(theta1*pi/180),L1*sin(theta1*pi/180)];
 x2 = [x1(1)+L2*cos((theta2+theta1-180)*pi/180),x1(2)+L2*sin((theta2+theta1-180)*pi/180)];
 
 cla;
-xlim([-4,4]);
-ylim([-4,4]);
+xlim([-1,1]);
+ylim([-1,1]);
 node1(x0);
 node2(x1);
 link1(x0,x1);
 link2(x1,x2);
 
+function initM2
+m1 = 0.2;
+m2 = 0.2;
+g = 9.8;
+L1 = 0.5;
+L2 = 0.5;
+w1 = 0.3;
+w2 = 0.3;
+F = 60;
+
+theta1 = linspace(0,180,31);
+theta2 = linspace(0,360,31);
+[X,Y] = meshgrid(theta1,theta2);
+M2 = F*L2*cos((X+Y-180)*pi/180) + m2*g*cos((X+Y-180)*pi/180);
+surf(X,Y,M2);
+hold on;
+
 
 function circle(x)
-r = 0.1;
+r = 0.01;
 ang=0:0.01:2*pi;
 xp=r*cos(ang);
 yp=r*sin(ang);
