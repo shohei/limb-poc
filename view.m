@@ -22,7 +22,7 @@ function varargout = view(varargin)
 
 % Edit the above text to modify the response to help view
 
-% Last Modified by GUIDE v2.5 16-Aug-2017 08:19:39
+% Last Modified by GUIDE v2.5 16-Aug-2017 18:10:51
 
 % Begin initialization code - DO NOT EDIT
 gui_Singleton = 1;
@@ -58,8 +58,17 @@ handles.theta1 = 90;
 handles.theta2 = 180;
 handles.L1 = 0.5;
 handles.L2 = 0.5;
+handles.m1 = 0.2;
+handles.m2 = 0.2;
+handles.g = 9.8;
+handles.L1 = 0.5;
+handles.L2 = 0.5;
+handles.w1 = 0.3;
+handles.w2 = 0.3;
+handles.F = 60;
 % Update handles structure
 guidata(hObject, handles);
+legend();
 % UIWAIT makes view wait for user response (see UIRESUME)
 % uiwait(handles.figure1);
 
@@ -91,26 +100,27 @@ theta1_theta2 = sprintf('%.2f, %.2f',theta1,theta2);
 axes(handles.axes1);
 drawAxis(L1,L2,theta1,theta2);
 
+m1 = handles.m1;
+m2 = handles.m2;
+g  = handles.g;
+L1 = handles.L1;
+L2 = handles.L2;
+w1 = handles.w1;
+w2 = handles.w2;
+F  = handles.F;
+
 axes(handles.axes3);
 cla;
-initM2;
+initM2(m1,m2,g,L1,L2,w1,w2,F)
 rotate3d on;
 hold on;
-m1 = 0.2;
-m2 = 0.2;
-g = 9.8;
-L1 = 0.5;
-L2 = 0.5;
-w1 = 0.3;
-w2 = 0.3;
-F = 60;
 M2 = F*L2*cos((theta1+theta2-180)*pi/180) + m2*g*cos((theta1+theta2-180)*pi/180);
 M2 = abs(M2)+100;
 plot3(theta1,theta2,M2,'ro','LineWidth',10);
 
 axes(handles.axes2);
 cla;
-initM1;
+initM1(m1,m2,g,L1,L2,w1,w2,F)
 rotate3d on;
 hold on;
 M1 = F*(L2*cos((theta1+theta2-180)*pi/180)+L1*cos(theta1*pi/180)) ...
@@ -150,21 +160,22 @@ theta1_theta2 = sprintf('%.2f, %.2f',theta1,theta2);
 axes(handles.axes1);
 drawAxis(L1,L2,theta1,theta2);
 
+m1 = handles.m1;
+m2 = handles.m2;
+g  = handles.g;
+L1 = handles.L1;
+L2 = handles.L2;
+w1 = handles.w1;
+w2 = handles.w2;
+F  = handles.F;
+
 axes(handles.axes3);
 cla;
-m1 = 0.2;
-m2 = 0.2;
-g = 9.8;
-L1 = 0.5;
-L2 = 0.5;
-w1 = 0.3;
-w2 = 0.3;
-F = 60;
 M2 = F*L2*cos((theta1+theta2-180)*pi/180) + m2*g*cos((theta1+theta2-180)*pi/180);
 M2 = abs(M2)+100;
 plot3(theta1,theta2,M2,'ro','LineWidth',10);
 hold on;
-initM2;
+initM2(m1,m2,g,L1,L2,w1,w2,F);
 rotate3d on;
 
 axes(handles.axes2);
@@ -176,7 +187,7 @@ M1 = F*(L2*cos((theta1+theta2-180)*pi/180)+L1*cos(theta1*pi/180)) ...
 M1 = abs(M1)+100;
 plot3(theta1,theta2,M1,'ro','LineWidth',10);
 hold on;
-initM1;
+initM1(m1,m2,g,L1,L2,w1,w2,F);
 rotate3d on;
 
 % hObject    handle to slider2 (see GCBO)
@@ -211,16 +222,7 @@ node2(x1);
 link1(x0,x1);
 link2(x1,x2);
 
-function initM2
-m1 = 0.2;
-m2 = 0.2;
-g = 9.8;
-L1 = 0.5;
-L2 = 0.5;
-w1 = 0.3;
-w2 = 0.3;
-F = 60;
-
+function initM2(m1,m2,g,L1,L2,w1,w2,F)
 theta1 = linspace(0,180,31);
 theta2 = linspace(0,360,31);
 [X,Y] = meshgrid(theta1,theta2);
@@ -233,16 +235,7 @@ hold on;
 % view(0,90);
 
 
-function initM1
-m1 = 0.2;
-m2 = 0.2;
-g = 9.8;
-L1 = 0.5;
-L2 = 0.5;
-w1 = 0.3;
-w2 = 0.3;
-F = 60;
-
+function initM1(m1,m2,g,L1,L2,w1,w2,F)
 theta1 = linspace(0,180,31);
 theta2 = linspace(0,360,31);
 [X,Y] = meshgrid(theta1,theta2);
@@ -284,3 +277,177 @@ line(x0,x1);
 
 function link2(x0,x1)
 line(x0,x1);
+
+
+
+function m1_text_Callback(hObject, eventdata, handles)
+% hObject    handle to m1_text (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+handles.m1 = str2double(get(hObject,'String')) 
+guidata(hObject,handles);
+% Hints: get(hObject,'String') returns contents of m1_text as text
+%        str2double(get(hObject,'String')) returns contents of m1_text as a double
+
+
+% --- Executes during object creation, after setting all properties.
+function m1_text_CreateFcn(hObject, eventdata, handles)
+% hObject    handle to m1_text (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    empty - handles not created until after all CreateFcns called
+
+% Hint: edit controls usually have a white background on Windows.
+%       See ISPC and COMPUTER.
+if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
+    set(hObject,'BackgroundColor','white');
+end
+
+
+
+function m2_text_Callback(hObject, eventdata, handles)
+handles.m2 = str2double(get(hObject,'String')) 
+guidata(hObject,handles);
+% hObject    handle to m2_text (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+
+% Hints: get(hObject,'String') returns contents of m2_text as text
+%        str2double(get(hObject,'String')) returns contents of m2_text as a double
+
+
+% --- Executes during object creation, after setting all properties.
+function m2_text_CreateFcn(hObject, eventdata, handles)
+% hObject    handle to m2_text (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    empty - handles not created until after all CreateFcns called
+
+% Hint: edit controls usually have a white background on Windows.
+%       See ISPC and COMPUTER.
+if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
+    set(hObject,'BackgroundColor','white');
+end
+
+
+
+function w1_text_Callback(hObject, eventdata, handles)
+% hObject    handle to w1_text (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+handles.w1 = str2double(get(hObject,'String')) ;
+guidata(hObject,handles);
+
+% Hints: get(hObject,'String') returns contents of w1_text as text
+%        str2double(get(hObject,'String')) returns contents of w1_text as a double
+
+
+% --- Executes during object creation, after setting all properties.
+function w1_text_CreateFcn(hObject, eventdata, handles)
+% hObject    handle to w1_text (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    empty - handles not created until after all CreateFcns called
+
+% Hint: edit controls usually have a white background on Windows.
+%       See ISPC and COMPUTER.
+if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
+    set(hObject,'BackgroundColor','white');
+end
+
+
+
+function w2_text_Callback(hObject, eventdata, handles)
+% hObject    handle to w2_text (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+handles.w2 = str2double(get(hObject,'String')) ;
+guidata(hObject,handles);
+
+% Hints: get(hObject,'String') returns contents of w2_text as text
+%        str2double(get(hObject,'String')) returns contents of w2_text as a double
+
+
+% --- Executes during object creation, after setting all properties.
+function w2_text_CreateFcn(hObject, eventdata, handles)
+% hObject    handle to w2_text (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    empty - handles not created until after all CreateFcns called
+
+% Hint: edit controls usually have a white background on Windows.
+%       See ISPC and COMPUTER.
+if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
+    set(hObject,'BackgroundColor','white');
+end
+
+
+function L1_text_Callback(hObject, eventdata, handles)
+% hObject    handle to L1_text (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+handles.L1 = str2double(get(hObject,'String')) ;
+guidata(hObject,handles);
+
+% Hints: get(hObject,'String') returns contents of L1_text as text
+%        str2double(get(hObject,'String')) returns contents of L1_text as a double
+
+
+% --- Executes during object creation, after setting all properties.
+function L1_text_CreateFcn(hObject, eventdata, handles)
+% hObject    handle to L1_text (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    empty - handles not created until after all CreateFcns called
+
+% Hint: edit controls usually have a white background on Windows.
+%       See ISPC and COMPUTER.
+if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
+    set(hObject,'BackgroundColor','white');
+end
+
+
+
+function L2_text_Callback(hObject, eventdata, handles)
+% hObject    handle to L2_text (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+handles.L2 = str2double(get(hObject,'String')) ;
+guidata(hObject,handles);
+
+
+% Hints: get(hObject,'String') returns contents of L2_text as text
+%        str2double(get(hObject,'String')) returns contents of L2_text as a double
+
+
+% --- Executes during object creation, after setting all properties.
+function L2_text_CreateFcn(hObject, eventdata, handles)
+% hObject    handle to L2_text (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    empty - handles not created until after all CreateFcns called
+
+% Hint: edit controls usually have a white background on Windows.
+%       See ISPC and COMPUTER.
+if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
+    set(hObject,'BackgroundColor','white');
+end
+
+
+
+function F_text_Callback(hObject, eventdata, handles)
+% hObject    handle to F_text (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+handles.F = str2double(get(hObject,'String')) ;
+guidata(hObject,handles);
+
+% Hints: get(hObject,'String') returns contents of F_text as text
+%        str2double(get(hObject,'String')) returns contents of F_text as a double
+
+
+% --- Executes during object creation, after setting all properties.
+function F_text_CreateFcn(hObject, eventdata, handles)
+% hObject    handle to F_text (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    empty - handles not created until after all CreateFcns called
+
+% Hint: edit controls usually have a white background on Windows.
+%       See ISPC and COMPUTER.
+if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
+    set(hObject,'BackgroundColor','white');
+end
