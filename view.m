@@ -90,11 +90,11 @@ theta1_theta2 = sprintf('%.2f, %.2f',theta1,theta2);
 % theta1_theta2
 axes(handles.axes1);
 drawAxis(L1,L2,theta1,theta2);
+
 axes(handles.axes3);
 cla;
 initM2;
-% set(handles.axes3,'view',[-37.5 30]);
-rotate3d;
+rotate3d on;
 hold on;
 m1 = 0.2;
 m2 = 0.2;
@@ -105,6 +105,17 @@ w1 = 0.3;
 w2 = 0.3;
 F = 60;
 M2 = F*L2*cos((theta1+theta2-180)*pi/180) + m2*g*cos((theta1+theta2-180)*pi/180);
+plot3(theta1,theta2,M2,'ro','LineWidth',10);
+
+axes(handles.axes2);
+cla;
+initM1;
+rotate3d on;
+hold on;
+M1 = F*(L2*cos((theta1+theta2-180)*pi/180)+L1*cos(theta1*pi/180)) ...
+     + m2*g*(L2*cos((theta1+theta2-180)*pi/180)+L1*cos(theta1*pi/180))...
+     + w2*L1*cos(theta1*pi/180) ...
+     + m1*g*(L1/2*cos(theta1*pi/180)); 
 plot3(theta1,theta2,M2,'ro','LineWidth',10);
 
 % Hints: get(hObject,'Value') returns position of slider
@@ -136,12 +147,9 @@ theta1_theta2 = sprintf('%.2f, %.2f',theta1,theta2);
 % theta1_theta2
 axes(handles.axes1);
 drawAxis(L1,L2,theta1,theta2);
+
 axes(handles.axes3);
 cla;
-initM2;
-% set(handles.axes3,'view',[-37.5 30]);
-rotate3d;
-hold on;
 m1 = 0.2;
 m2 = 0.2;
 g = 9.8;
@@ -152,6 +160,20 @@ w2 = 0.3;
 F = 60;
 M2 = F*L2*cos((theta1+theta2-180)*pi/180) + m2*g*cos((theta1+theta2-180)*pi/180);
 plot3(theta1,theta2,M2,'ro','LineWidth',10);
+hold on;
+initM2;
+rotate3d on;
+
+axes(handles.axes2);
+cla;
+M1 = F*(L2*cos((theta1+theta2-180)*pi/180)+L1*cos(theta1*pi/180)) ...
+     + m2*g*(L2*cos((theta1+theta2-180)*pi/180)+L1*cos(theta1*pi/180)) ...
+     + w2*L1*cos(theta1*pi/180) ...
+     + m1*g*(L1/2*cos(theta1*pi/180));
+plot3(theta1,theta2,M2,'ro','LineWidth',10);
+hold on;
+initM1;
+rotate3d on;
 
 % hObject    handle to slider2 (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
@@ -198,8 +220,28 @@ F = 60;
 theta1 = linspace(0,180,31);
 theta2 = linspace(0,360,31);
 [X,Y] = meshgrid(theta1,theta2);
-M2 = F*L2*cos((X+Y-180)*pi/180) + m2*g*cos((X+Y-180)*pi/180);
+M2 = F*L2*cos((X+Y-180)*pi/180) + m2*g*L2*cos((X+Y-180)*pi/180);
 surf(X,Y,M2);
+hold on;
+
+function initM1
+m1 = 0.2;
+m2 = 0.2;
+g = 9.8;
+L1 = 0.5;
+L2 = 0.5;
+w1 = 0.3;
+w2 = 0.3;
+F = 60;
+
+theta1 = linspace(0,180,31);
+theta2 = linspace(0,360,31);
+[X,Y] = meshgrid(theta1,theta2);
+M1 = F*(L2*cos((X+Y-180)*pi/180)+L1*cos(X*pi/180)) ...
+     + m2*g*(L2*cos((X+Y-180)*pi/180)+L1*cos(X*pi/180))...
+     + w2*L1*cos(X*pi/180) ...
+     + m1*g*(L1/2*cos(X*pi/180));
+surf(X,Y,M1);
 hold on;
 
 
