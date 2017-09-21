@@ -6,6 +6,7 @@ Copyright Shokara Inc. 2017
 """
 
 import math
+import numpy as np
 from pylab import *
 
 # preset parameter
@@ -18,6 +19,14 @@ m1 = 1 # [kg]
 m2 = 1 # [kg]
 w1 = 1 # [kg]
 w2 = 1 # [kg]
+y_final = 1400
+
+def linear_interpolation(x0,y0,x1,y1):
+    a = (y1-y0)/(x1-x0)
+    b = y0 - a*x0
+    xs = linspace(x0,x1,10)
+    ys = [a*x+b for x in xs] 
+    return (xs,ys) 
 
 def compute(x, y):
     """arguments: x:X2, y:Y2"""
@@ -54,24 +63,46 @@ X2s = linspace(-0.3,0.3,7)
 L1s = linspace(0.3, 1.5, 10)
 L2s = linspace(0.3, 1.5, 10)
 
-M1s = []
-M2s = []
-params = []
+maxM1s = []
+maxParams = []
 for X2 in X2s:
     for L1 in L1s:
         for L2 in L2s:
-            result = compute(X2,Y2)
-            if result!=None:
-                M1s.append(abs(result[0]))
-                M2s.append(abs(result[1]))
-                params.append((X2,L1,L2))
-        
-i1 = M1s.index(max(M1s))
-print("max M1: ", max(M1s))
-print("X2: ", params[i1][0], ", L1: ", params[i1][1], ", L2: ", params[i1][2])
-print()
+            M1s = []
+            M2s = []
+            params = []
+            x_final = X2-380
+            (xs, ys) = linear_interpolation(X2, Y2, x_final, y_final)
+            for idx, x in enumerate(xs):
+                y = ys[idx]
+                result = compute(x,y)
+                if result!=None:
+                    M1s.append(abs(result[0]))
+                    M2s.append(abs(result[1]))
+                    params.append((X2,L1,L2))
+            if M1s==[]:
+                continue 
+            i1 = M1s.index(max(M1s))
+            # i2 = M2s.index(max(M2s))
+            maxM1s.append(max(M1s))
+            maxParams.append(params[i1])
 
-i2 = M2s.index(max(M2s))
-print("max M2: ", max(M2s))
-print("X2: ", params[i2][0], ", L1: ", params[i2][1], ", L2: ", params[i2][2])
+myarray = np.array(maxM1s)
+K = 60 
+unsorted_max_indices = np.argpartition(myarray, K)[:K]
+y = myarray[unsorted_max_indices]
+indices = np.argsort(-y)
+max_k_indices = unsorted_max_indices[indices]
+data = []
+for i in max_k_indices:
+    data.append([maxM1s[i], maxParams[i][0], maxParams[i][1], maxParams[i][2]])
+for row in data:
+    print("{: >20} {: >20} {: >20} {: >20}".format(*row))
+
+
+# M1minIndex = maxM1s.index(min(maxM1s))
+# M1min = maxM1s[M1minIndex]
+# minParam = maxParams[M1minIndex]
+#
+# print("M1 min : ", M1min, ", X2: ,", minParam[0], ", L1: ", minParam[1], ", L2: ", minParam[2])
 
