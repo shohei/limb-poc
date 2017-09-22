@@ -33,10 +33,10 @@ def compute(x, y):
     #inverse kinematics
     cos_a = (-(x**2+y**2)+L1**2+L2**2)/(2*L1*L2)
     try:
-        a = math.acos(cos_a)
+        a = -math.atan2(sqrt(1 - cos_a**2, cos_a))
     except Exception:
         return
-    theta2 = 2*pi - a
+    theta2 = pi - a
     theta1 = math.atan2(x, y) \
                - math.atan2(L2*sin(theta2), L1+L2*cos(theta2))
     #calculate motor torque M2
