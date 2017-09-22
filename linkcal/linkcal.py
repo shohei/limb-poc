@@ -250,7 +250,7 @@ data = []
 print("{:>10} {:>10} {:>10} {:>10} {:>10} {:>10}".format("Max M1","X2","L1","L2","theta1","theta2"))
 counter = 1
 for i in max_k_indices:
-    data.append([round(maxM1s[i],2), round(maxParams[i][0],2), round(maxParams[i][1],2), round(maxParams[i][2],2), round(maxParams[i][3]/pi*180,2), round(maxParams[i][4]/pi*180,2)])
+    data.append([round(maxM1s[i],3), round(maxParams[i][0],3), round(maxParams[i][1],3), round(maxParams[i][2],3), round(maxParams[i][3]/pi*180,3), round(maxParams[i][4]/pi*180,3)])
 
 fig = figure(figsize=(12,10)) 
 fig.patch.set_facecolor('white') 
