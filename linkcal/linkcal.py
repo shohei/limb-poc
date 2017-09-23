@@ -2,7 +2,7 @@
 #-*- coding:utf-8 -*-
 """
 Motor torque calculator
-Copyright Shokara Inc. 2017
+Shokara Inc. 2017
 """
 
 import warnings
@@ -94,8 +94,6 @@ def inverse_kinematics(x, y):
     theta2_dash = pi - a
     theta1 = math.atan2(y, x) \
                - math.atan2(L2*sin(theta2_dash), L1+L2*cos(theta2_dash))
-    # print("ik input: (x2,y2)",(x,y))
-    # print("   ik result: (theta1,theta2)",(theta1*180/pi,theta2*180/pi))
     #calculate motor torque M2
     alpha = math.atan2(380,600)
     F = W*g*sin(alpha)
@@ -120,6 +118,9 @@ def inverse_kinematics(x, y):
 
     M1 = m2*g*cos(theta4)*L3 + F*cos(gamma)*cos(theta5)*L4 \
             - 0.5*m1*g*L1*sin(theta1) - w2*g*L1*sin(theta1)
+    M1_static = m2*g*cos(theta4)*L3 - 0.5*m1*g*L1*sin(theta1) - w2*g*L1*sin(theta1)
+
+    M1 = max(abs(M1),abs(M1_static))
     if(math.isnan(M1) or math.isnan(M2)):
         # print("M1 or M2 is NaN")
         return
@@ -127,7 +128,7 @@ def inverse_kinematics(x, y):
     forward_kinematics(L1, L2, theta1,theta2)
     if(theta2>2*pi):
         theta2 = theta2 - 2*pi
-    return (M1, M2, theta1, theta2)
+    return (abs(M1), abs(M2), theta1, theta2)
 
 def usage():
     sys.stderr.write("Usage: " + sys.argv[0] + " .ini file\n")
@@ -204,9 +205,6 @@ w1 = float(ini.get("Parameters", "w1"))
 w2 = float(ini.get("Parameters", "w2"))
 y_final = float(ini.get("Parameters", "y_final"))
 
-# X2s = linspace(-0.3,0.3,7)
-# L1s = linspace(0.3, 1.2, 10)
-# L2s = linspace(0.3, 1.2, 10)
 X2s = linspace(X2min, X2max,10)
 L1s = linspace(L1min, L1max, 10)
 L2s = linspace(L2min, L2max, 10)
@@ -247,7 +245,6 @@ y = myarray[unsorted_max_indices]
 indices = np.argsort(-y)
 max_k_indices = unsorted_max_indices[indices]
 data = []
-print("{:>10} {:>10} {:>10} {:>10} {:>10} {:>10}".format("Max M1","X2","L1","L2","theta1","theta2"))
 counter = 1
 for i in max_k_indices:
     data.append([round(maxM1s[i],3), round(maxParams[i][0],3), round(maxParams[i][1],3), round(maxParams[i][2],3), round(maxParams[i][3]/pi*180,3), round(maxParams[i][4]/pi*180,3)])
@@ -257,6 +254,7 @@ fig.patch.set_facecolor('white')
 fig.canvas.set_window_title('result')
 data.reverse()
 print('[Result]')
+print("{:>10} {:>10} {:>10} {:>10} {:>10} {:>10}".format("Max M1","X2","L1","L2","theta1","theta2"))
 for row in data:
     print("{: >10} {: >10} {: >10} {: >10} {: >10} {: >10}".format(*row))
     ax = fig.add_subplot(5,2,counter)
