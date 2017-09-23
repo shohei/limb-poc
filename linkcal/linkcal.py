@@ -83,6 +83,34 @@ def line(x0,x1):
     ys = linspace(x0[1],x1[1],10)
     plot(xs,ys,"b",linewidth=2)
 
+
+def inverse_kinematics_vertical(x, y):
+    cos_a = (-(x**2+y**2)+L1**2+L2**2)/(2*L1*L2)
+    try:
+        a = - math.atan2(sqrt(1 - cos_a**2), cos_a)
+    except Exception:
+        # print("a fail and exit")
+        return
+    theta2 = 2*pi - a
+    theta2_dash = pi - a
+    theta1 = math.atan2(y, x) \
+               - math.atan2(L2*sin(theta2_dash), L1+L2*cos(theta2_dash))
+    #calculate motor torque M2
+    theta3 = theta1+theta2-pi
+
+    M2 = 0.5*L2*m2*g*cos(theta3) + W*g*L2*cos(theta3)
+
+    M1 = (W+m2+w2)*g*L1*sin(theta1) + 0.5*m1*g*L1*sin(theta1)
+
+    if(math.isnan(M1) or math.isnan(M2)):
+        # print("M1 or M2 is NaN")
+        return
+
+    forward_kinematics(L1, L2, theta1,theta2)
+    if(theta2>2*pi):
+        theta2 = theta2 - 2*pi
+    return (abs(M1), abs(M2), theta1, theta2)
+
 def inverse_kinematics(x, y):
     cos_a = (-(x**2+y**2)+L1**2+L2**2)/(2*L1*L2)
     try:
@@ -95,7 +123,7 @@ def inverse_kinematics(x, y):
     theta1 = math.atan2(y, x) \
                - math.atan2(L2*sin(theta2_dash), L1+L2*cos(theta2_dash))
     #calculate motor torque M2
-    alpha = math.atan2(380,600)
+    alpha = math.atan2(initial_center_of_gravity_horizontal_offset,initial_center_of_gravity_height)
     F = W*g*sin(alpha)
     theta3 = theta1+theta2-pi
     gamma = alpha + theta3 - pi/2
@@ -204,6 +232,9 @@ m2 = float(ini.get("Parameters", "m2"))
 w1 = float(ini.get("Parameters", "w1"))
 w2 = float(ini.get("Parameters", "w2"))
 y_final = float(ini.get("Parameters", "y_final"))
+initial_center_of_gravity_height = float(ini.get("Parameters", "initial_center_of_gravity_height"))
+initial_center_of_gravity_horizontal_offset = float(ini.get("Parameters", "initial_center_of_gravity_horizontal_offset"))
+mode = ini.get("Parameters", "mode")
 
 X2s = linspace(X2min, X2max,10)
 L1s = linspace(L1min, L1max, 10)
@@ -213,33 +244,54 @@ maxM1s = []
 maxParams = []
 maxCount = len(X2s)*len(L1s)*len(L2s)
 counter = 0
-for X2 in X2s:
+if mode=="horizontal":
+    for X2 in X2s:
+        for L1 in L1s:
+            for L2 in L2s:
+                M1s = []
+                M2s = []
+                params = []
+                x_final = X2-initial_center_of_gravity_horizontal_offset
+                (xs, ys) = linear_interpolation(X2, Y2, x_final, y_final)
+                for idx, x in enumerate(xs):
+                    y = ys[idx]
+                    result = inverse_kinematics(x,y)
+                    if result!=None:
+                        M1s.append(abs(result[0]))
+                        M2s.append(abs(result[1]))
+                        params.append((X2,L1,L2,result[2],result[3]))
+                if M1s==[]:
+                    continue 
+                i1 = M1s.index(max(M1s))
+                # i2 = M2s.index(max(M2s))
+                maxM1s.append(max(M1s))
+                maxParams.append(params[i1])
+                percentage = int(counter*1.0/maxCount*100)
+                print("calculating",percentage,"%",end='\r')
+                counter = counter + 1
+
+elif mode=="vertical":
+    X2 = 0
     for L1 in L1s:
         for L2 in L2s:
-            M1s = []
-            M2s = []
             params = []
-            x_final = X2-0.38
-            (xs, ys) = linear_interpolation(X2, Y2, x_final, y_final)
-            for idx, x in enumerate(xs):
-                y = ys[idx]
-                result = inverse_kinematics(x,y)
-                if result!=None:
-                    M1s.append(abs(result[0]))
-                    M2s.append(abs(result[1]))
-                    params.append((X2,L1,L2,result[2],result[3]))
-            if M1s==[]:
-                continue 
-            i1 = M1s.index(max(M1s))
+            x_final = 0 
+            result = inverse_kinematics_vertical(X2,Y2)
+            print(result)
+            if result==None:
+                continue
+            M1s = abs(result[0])
+            M2s = abs(result[1])
+            params = (X2,L1,L2,result[2],result[3])
             # i2 = M2s.index(max(M2s))
-            maxM1s.append(max(M1s))
-            maxParams.append(params[i1])
+            maxM1s.append(M1s)
+            maxParams.append(params)
             percentage = int(counter*1.0/maxCount*100)
             print("calculating",percentage,"%",end='\r')
             counter = counter + 1
 
 myarray = np.array(maxM1s)
-K = 10 
+K = 10
 unsorted_max_indices = np.argpartition(myarray, K)[:K]
 y = myarray[unsorted_max_indices]
 indices = np.argsort(-y)
@@ -265,3 +317,6 @@ for row in data:
     forward_kinematics_draw(row[2],row[3],row[4]*pi/180,row[5]*pi/180)
 
 show()
+
+input("Press enter to exit:")
+exit()
